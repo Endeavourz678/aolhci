@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unicorp - Share Your Notes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #2a2a2a;
+            color: #333;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 120px;
+            background: #1a1a1a;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #1a1a1a;
+        }
+
+        .nav-item {
+            width: 50px;
+            height: 50px;
+            background: #333;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 20px;
+            color: white;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: #555;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 120px;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header */
+        .header {
+            padding: 20px 30px;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            z-index: 10;
+        }
+
+        .welcome-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .character {
+            width: 60px;
+            height: 60px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        .welcome-text h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .welcome-text p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-box {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            width: 200px;
+            background: #f8f8f8;
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 30px;
+            overflow: visible;
+            position: relative;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Home Page */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .subject-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .subject-item {
+            background: #1a1a1a;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .subject-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .subject-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a1a1a;
+            font-weight: bold;
+        }
+
+        .subject-info h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .subject-info p {
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        .notes-preview {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .note-card {
+            background: #f8f8f8;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .note-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .note-thumbnail {
+            width: 100%;
+            height: 120px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+            border: 1px solid #eee;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .note-title {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .coin-lock {
+            display: inline-block;
+            background: #FFD700;
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        /* Notes Gallery */
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .note-card-large {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .note-card-large:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .note-card-large .note-thumbnail {
+            height: 200px;
+            margin-bottom: 15px;
+        }
+
+        .note-info {
+            text-align: left;
+        }
+
+        .note-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .author-avatar {
+            width: 30px;
+            height: 30px;
+            background: #4CAF50;
+            border-radius: 50%;
+        }
+
+        .author-name {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .note-description {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* Chat Page */
+        .chat-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: 70vh;
+        }
+
+        .friends-list {
+            background: #f8f8f8;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .friend-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .friend-item:hover {
+            background: #e8f5e8;
+        }
+
+        .friend-avatar {
+            width: 40px;
+            height: 40px;
+            background: #4CAF50;
+            border-radius: 50%;
+        }
+
+        .friend-info h4 {
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        .friend-info p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .chat-area {
+            background: #f8f8f8;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 70vh;
+        }
+
+        .chat-header {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            max-height: 400px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .message.my-message {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            background: #4CAF50;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .my-message .message-avatar {
+            background: #2196F3;
+        }
+
+        .message-content {
+            max-width: 70%;
+            background: #e8f5e8;
+            padding: 10px 15px;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .my-message .message-content {
+            background: #e3f2fd;
+        }
+
+        .message-text {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #666;
+            opacity: 0.7;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .chat-send-btn {
+            padding: 12px 25px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .chat-send-btn:hover {
+            background: #45a049;
+        }
+
+        .chat-send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .empty-chat {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: #666;
+        }
+
+        .friend-item.active {
+            background: #e8f5e8 !important;
+            border-left: 4px solid #4CAF50;
+        }
+
+        /* Profile Page */
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: #4CAF50;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+        }
+
+        .add-notes-section {
+            background: #f8f8f8;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .add-notes-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+
+        .add-notes-btn:hover {
+            background: #45a049;
+        }
+
+        .user-notes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        /* Coin System */
+        .coin-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #FFD700;
+            color: #333;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: bold;
+            z-index: 2147483647 !important;
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+            border: 3px solid #FFA500;
+            font-size: 16px;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+            pointer-events: auto;
+            isolation: isolate;
+            will-change: transform;
+            backface-visibility: hidden;
+        }
+
+        .coin-display:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #ccc;
+            color: #333;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chat-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .notes-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .coin-display {
+                top: 20px !important;
+                right: 20px !important;
+                padding: 10px 18px;
+                font-size: 14px;
+                border-radius: 25px;
+                z-index: 2147483647 !important;
+                transform: translateZ(0) !important;
+            }
+            
+            .header {
+                padding: 15px 20px;
+            }
+            
+            .header-right {
+                gap: 10px;
+            }
+            
+            .search-box {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Coin Display -->
+    <!-- <div class="coin-display">
+        💰 <span id="coinCount">50</span> Coins
+    </div> -->
+
+    <!-- Coin Display -->
+    <div class="coin-display" style="position: fixed; top: 120px; right: 30px; z-index: 2147483647 !important; margin: 0; transform: translateZ(0);">
+        💰 <span id="coinCount">50</span> Coins
+    </div>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">U.</div>
+            <div class="nav-item active" data-page="home">🏠</div>
+            <div class="nav-item" data-page="subjects">📚</div>
+            <div class="nav-item" data-page="notes">📄</div>
+            <div class="nav-item" data-page="chat">💬</div>
+            <div class="nav-item" data-page="profile">👤</div>
+            <div class="nav-item" data-page="statistics">📊</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="welcome-section">
+                    <div class="character">👨‍💻</div>
+                    <div class="welcome-text">
+                        <h2>Welcome back Luigi</h2>
+                        <p>IT'S GOOD TO SEE YOU AGAIN</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <input type="text" class="search-box" placeholder="Search Note...">
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-number">24</div>
+                            <div class="stat-label">downloaded notes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">10</div>
+                            <div class="stat-label">uploaded notes</div>
+                        </div>
+                    </div>
+                    <div class="user-profile"></div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Home Page -->
+                <div class="page active" id="home">
+                    <div class="content-grid">
+                        <div>
+                            <div class="section-title">SUBJECT</div>
+                            <div class="subject-list">
+                                <div class="subject-item" data-subject="data-structure">
+                                    <div class="subject-icon">DS</div>
+                                    <div class="subject-info">
+                                        <h3>Data Structure</h3>
+                                        <p>Array to binary search with efficient sorting and computing</p>
+                                    </div>
+                                </div>
+                                <div class="subject-item" data-subject="mathematics">
+                                    <div class="subject-icon">📊</div>
+                                    <div class="subject-info">
+                                        <h3>Mathematics</h3>
+                                        <p>Study of numbers, patterns, and problem solving</p>
+                                    </div>
+                                </div>
+                                <div class="subject-item" data-subject="economy">
+                                    <div class="subject-icon">📈</div>
+                                    <div class="subject-info">
+                                        <h3>Economy</h3>
+                                        <p>Study of finance and government business to boost production</p>
+                                    </div>
+                                </div>
+                                <div class="subject-item" data-subject="biology">
+                                    <div class="subject-icon">🧬</div>
+                                    <div class="subject-info">
+                                        <h3>Biology</h3>
+                                        <p>Study of living organisms and life processes</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="section-title">ALL YOUR NOTES</div>
+                            <div class="notes-preview">
+                                <div class="note-card">
+                                    <div class="note-thumbnail">Economy Notes Preview</div>
+                                    <div class="note-title">Economy</div>
+                                </div>
+                                <div class="note-card">
+                                    <div class="note-thumbnail">Statistics Notes Preview</div>
+                                    <div class="note-title">Statistics</div>
+                                </div>
+                                <div class="note-card">
+                                    <div class="note-thumbnail">Math Notes Preview</div>
+                                    <div class="note-title">Mathematics</div>
+                                </div>
+                                <div class="note-card">
+                                    <div class="note-thumbnail">Biology Notes Preview</div>
+                                    <div class="note-title">Biology</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subjects Page -->
+                <div class="page" id="subjects">
+                    <div class="section-title">SUBJECT CATEGORIES</div>
+                    <div class="subject-list">
+                        <div class="subject-item">
+                            <div class="subject-icon">📊</div>
+                            <div class="subject-info">
+                                <h3>Mathematics</h3>
+                                <p>Study of numbers, patterns, and problem solving</p>
+                            </div>
+                        </div>
+                        <div class="subject-item">
+                            <div class="subject-icon">📈</div>
+                            <div class="subject-info">
+                                <h3>Economy</h3>
+                                <p>Study of finance and government business</p>
+                            </div>
+                        </div>
+                        <div class="subject-item">
+                            <div class="subject-icon">💼</div>
+                            <div class="subject-info">
+                                <h3>Business</h3>
+                                <p>Study of key commercial aspects, make decisions and many more</p>
+                            </div>
+                        </div>
+                        <div class="subject-item">
+                            <div class="subject-icon">💻</div>
+                            <div class="subject-info">
+                                <h3>Computer</h3>
+                                <p>Study of computational systems and programming</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Gallery -->
+                <div class="page" id="notes">
+                    <div class="section-title">ECONOMY NOTES</div>
+                    <div class="notes-grid">
+                        <div class="note-card-large" data-cost="10">
+                            <div class="note-thumbnail">Economic Theory Preview</div>
+                            <div class="note-info">
+                                <div class="note-author">
+                                    <div class="author-avatar"></div>
+                                    <div class="author-name">Vinson</div>
+                                </div>
+                                <div class="note-title">Notes Title <span class="coin-lock">10 💰</span></div>
+                                <div class="note-description">Captions Captions Captions Captions Captions Captions Captions Captions</div>
+                            </div>
+                        </div>
+                        <div class="note-card-large" data-cost="15">
+                            <div class="note-thumbnail">Market Analysis Preview</div>
+                            <div class="note-info">
+                                <div class="note-author">
+                                    <div class="author-avatar"></div>
+                                    <div class="author-name">Vinson</div>
+                                </div>
+                                <div class="note-title">Notes Title <span class="coin-lock">15 💰</span></div>
+                                <div class="note-description">Captions Captions Captions Captions Captions Captions Captions Captions</div>
+                            </div>
+                        </div>
+                        <div class="note-card-large" data-cost="5">
+                            <div class="note-thumbnail">Micro Economics</div>
+                            <div class="note-info">
+                                <div class="note-author">
+                                    <div class="author-avatar"></div>
+                                    <div class="author-name">Vinson</div>
+                                </div>
+                                <div class="note-title">Notes Title <span class="coin-lock">5 💰</span></div>
+                                <div class="note-description">Captions Captions Captions Captions Captions Captions Captions Captions</div>
+                            </div>
+                        </div>
+                        <div class="note-card-large" data-cost="20">
+                            <div class="note-thumbnail">Macro Economics</div>
+                            <div class="note-info">
+                                <div class="note-author">
+                                    <div class="author-avatar"></div>
+                                    <div class="author-name">Vinson</div>
+                                </div>
+                                <div class="note-title">Notes Title <span class="coin-lock">20 💰</span></div>
+                                <div class="note-description">Captions Captions Captions Captions Captions Captions Captions Captions</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Page -->
+                <div class="page" id="chat">
+                    <div class="section-title">CHAT</div>
+                    <div class="chat-container">
+                        <div class="friends-list">
+                            <input type="text" class="search-box" placeholder="Search friend..." style="width: 100%; margin-bottom: 20px;">
+                            <div class="friend-item">
+                                <div class="friend-avatar"></div>
+                                <div class="friend-info">
+                                    <h4>Vinson</h4>
+                                    <p>Bagi jawaban dong gi</p>
+                                </div>
+                            </div>
+                            <div class="friend-item">
+                                <div class="friend-avatar"></div>
+                                <div class="friend-info">
+                                    <h4>Angelo</h4>
+                                    <p>Bagi jawaban dong gi</p>
+                                </div>
+                            </div>
+                            <div class="friend-item">
+                                <div class="friend-avatar"></div>
+                                <div class="friend-info">
+                                    <h4>Darryl</h4>
+                                    <p>Bagi jawaban dong gi</p>
+                                </div>
+                            </div>
+                            <div class="friend-item">
+                                <div class="friend-avatar"></div>
+                                <div class="friend-info">
+                                    <h4>Owen</h4>
+                                    <p>Bagi jawaban dong gi</p>
+                                </div>
+                            </div>
+                            <div class="friend-item">
+                                <div class="friend-avatar"></div>
+                                <div class="friend-info">
+                                    <h4>Calvin</h4>
+                                    <p>Bagi jawaban dong gi</p>
+                                </div>
+                            </div>
+                            <div class="friend-item">
+                                <div class="friend-avatar"></div>
+                                <div class="friend-info">
+                                    <h4>Bryant</h4>
+                                    <p>Bagi jawaban dong gi</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-area">
+                            <div class="empty-chat" id="emptyChatState">
+                                <h3>💬 Select a friend to start chatting</h3>
+                                <p>Choose someone from your friends list to begin a conversation</p>
+                            </div>
+                            <div id="activeChatArea" style="display: none; height: 100%;">
+                                <div class="chat-header">
+                                    <h3 id="chatUserName">Chat with Friend</h3>
+                                    <span id="chatUserStatus" style="color: #666; font-size: 14px;">Online</span>
+                                </div>
+                                <div class="chat-messages" id="chatMessages">
+                                    <!-- Messages will be loaded here -->
+                                </div>
+                                <div class="chat-input-area">
+                                    <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." maxlength="500">
+                                    <button class="chat-send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Page -->
+                <div class="page" id="profile">
+                    <div class="profile-header">
+                        <div class="profile-avatar"></div>
+                        <h2>Welcome to your profile Luigi</h2>
+                        <div class="stats">
+                            <div class="stat-item">
+                                <div class="stat-number">24</div>
+                                <div class="stat-label">downloaded notes</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">10</div>
+                                <div class="stat-label">uploaded notes</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="add-notes-section">
+                        <h3>➕ add your notes here</h3>
+                        <button class="add-notes-btn" onclick="showUploadModal()">Upload New Note</button>
+                    </div>
+
+                    <div class="user-notes">
+                        <div class="note-card">
+                            <div class="note-thumbnail">Economy Notes</div>
+                            <div class="note-title">Economy</div>
+                        </div>
+                        <div class="note-card">
+                            <div class="note-thumbnail">Economy Notes</div>
+                            <div class="note-title">Economy</div>
+                        </div>
+                        <div class="note-card">
+                            <div class="note-thumbnail">Economy Notes</div>
+                            <div class="note-title">Economy</div>
+                        </div>
+                        <div class="note-card">
+                            <div class="note-thumbnail">Economy Notes</div>
+                            <div class="note-title">Economy</div>
+                        </div>
+                        <div class="note-card">
+                            <div class="note-thumbnail">Economy Notes</div>
+                            <div class="note-title">Economy</div>
+                        </div>
+                        <div class="note-card">
+                            <div class="note-thumbnail">Economy Notes</div>
+                            <div class="note-title">Economy</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Page -->
+                <div class="page" id="statistics">
+                    <div class="section-title">STATISTICS</div>
+                    <div class="content-grid">
+                        <div>
+                            <h3>SUBJECT PERFORMANCE</h3>
+                            <div class="subject-list">
+                                <div class="subject-item">
+                                    <div class="subject-icon">📈</div>
+                                    <div class="subject-info">
+                                        <h3>Economy</h3>
+                                        <p>Most downloaded subject</p>
+                                    </div>
+                                </div>
+                                <div class="subject-item">
+                                    <div class="subject-icon">📊</div>
+                                    <div class="subject-info">
+                                        <h3>Statistics</h3>
+                                        <p>Recently added notes</p>
+                                    </div>
+                                </div>
+                                <div class="subject-item">
+                                    <div class="subject-icon">🧬</div>
+                                    <div class="subject-info">
+                                        <h3>Biology</h3>
+                                        <p>Popular this week</p>
+                                    </div>
+                                </div>
+                                <div class="subject-item">
+                                    <div class="subject-icon">💻</div>
+                                    <div class="subject-info">
+                                        <h3>Computer</h3>
+                                        <p>Trending topic</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3>YOUR ACTIVITY</h3>
+                            <div class="notes-preview">
+                                <div class="note-card">
+                                    <div class="note-thumbnail">Recent Upload</div>
+                                    <div class="note-title">Notes Title</div>
+                                </div>
+                                <div class="note-card">
+                                    <div class="note-thumbnail">Popular Note</div>
+                                    <div class="note-title">Notes Title</div>
+                                </div>
+                                <div class="note-card">
+                                    <div class="note-thumbnail">Most Viewed</div>
+                                    <div class="note-title">Notes Title</div>
+                                </div>
+                                <div class="note-card">
+                                    <div class="note-thumbnail">Latest Download</div>
+                                    <div class="note-title">Notes Title</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase Modal -->
+    <div class="modal" id="purchaseModal">
+        <div class="modal-content">
+            <h3>🔒 Premium Note</h3>
+            <p>This note requires <span id="modalCost">10</span> coins to unlock.</p>
+            <p>You have <span id="modalCurrentCoins">50</span> coins available.</p>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="purchaseNote()">Purchase & Download</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <h3>📤 Upload New Note</h3>
+            <form style="text-align: left; margin-top: 20px;">
+                <div style="margin-bottom: 15px;">
+                    <label>Title:</label>
+                    <input type="text" style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Subject:</label>
+                    <select style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option>Mathematics</option>
+                        <option>Economy</option>
+                        <option>Biology</option>
+                        <option>Computer</option>
+                        <option>Business</option>
+                        <option>Statistics</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Price (Coins):</label>
+                    <input type="number" min="0" max="50" style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>File:</label>
+                    <input type="file" accept=".pdf,.doc,.docx,.png,.jpg" style="width: 100%; padding: 8px; margin-top: 5px;">
+                </div>
+            </form>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="uploadNote()">Upload Note</button>
+                <button class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentCoins = 50;
+        let currentNoteCost = 0;
+        let activeChatUser = null;
+        let chatMessages = {
+            'Vinson': [
+                { sender: 'Vinson', message: 'Bagi jawaban dong gi', time: '10:30', isMe: false },
+                { sender: 'Luigi', message: 'Jawaban yang mana?', time: '10:32', isMe: true },
+                { sender: 'Vinson', message: 'Yang economics itu', time: '10:33', isMe: false }
+            ],
+            'Angelo': [
+                { sender: 'Angelo', message: 'Bagi jawaban dong gi', time: '09:15', isMe: false },
+                { sender: 'Luigi', message: 'Halo Angelo!', time: '09:20', isMe: true }
+            ],
+            'Darryl': [
+                { sender: 'Darryl', message: 'Bagi jawaban dong gi', time: '08:45', isMe: false }
+            ],
+            'Owen': [
+                { sender: 'Owen', message: 'Bagi jawaban dong gi', time: '11:00', isMe: false },
+                { sender: 'Luigi', message: 'Hai Owen, butuh bantuan apa?', time: '11:05', isMe: true },
+                { sender: 'Owen', message: 'Mau tanya tentang statistics', time: '11:07', isMe: false }
+            ],
+            'Calvin': [
+                { sender: 'Calvin', message: 'Bagi jawaban dong gi', time: '14:20', isMe: false }
+            ],
+            'Bryant': [
+                { sender: 'Bryant', message: 'Bagi jawaban dong gi', time: '16:45', isMe: false },
+                { sender: 'Luigi', message: 'Bryant! Long time no see', time: '16:50', isMe: true },
+                { sender: 'Bryant', message: 'Yeah! Gimana kuliah?', time: '16:52', isMe: false },
+                { sender: 'Luigi', message: 'Alhamdulillah lancar, kamu gimana?', time: '16:53', isMe: true }
+            ]
+        };
+
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const targetPage = item.dataset.page;
+                
+                // Update active nav item
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                
+                // Show target page
+                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+                document.getElementById(targetPage).classList.add('active');
+            });
+        });
+
+        // Subject navigation
+        document.querySelectorAll('.subject-item').forEach(item => {
+            item.addEventListener('click', () => {
+                // Switch to notes page
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                document.querySelector('[data-page="notes"]').classList.add('active');
+                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+                document.getElementById('notes').classList.add('active');
+            });
+        });
+
+        // Note purchase system
+        document.querySelectorAll('.note-card-large').forEach(noteCard => {
+            noteCard.addEventListener('click', () => {
+                const cost = parseInt(noteCard.dataset.cost);
+                currentNoteCost = cost;
+                
+                document.getElementById('modalCost').textContent = cost;
+                document.getElementById('modalCurrentCoins').textContent = currentCoins;
+                document.getElementById('purchaseModal').classList.add('show');
+            });
+        });
+
+        function purchaseNote() {
+            if (currentCoins >= currentNoteCost) {
+                currentCoins -= currentNoteCost;
+                document.getElementById('coinCount').textContent = currentCoins;
+                
+                // Simulate download
+                alert('Note purchased and downloaded successfully! 🎉');
+                closeModal();
+            } else {
+                alert('Insufficient coins! Please earn more coins by uploading notes.');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('purchaseModal').classList.remove('show');
+        }
+
+        function showUploadModal() {
+            document.getElementById('uploadModal').classList.add('show');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('show');
+        }
+
+        function uploadNote() {
+            // Simulate successful upload
+            currentCoins += 10; // Reward for uploading
+            document.getElementById('coinCount').textContent = currentCoins;
+            
+            alert('Note uploaded successfully! You earned 10 coins! 🎉');
+            closeUploadModal();
+        }
+
+        // Search functionality
+        document.querySelectorAll('.search-box').forEach(searchBox => {
+            searchBox.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                // Add search logic here
+                console.log('Searching for:', searchTerm);
+            });
+        });
+
+        // Friend chat functionality
+        function selectFriend(friendName) {
+            activeChatUser = friendName;
+            
+            // Update active friend styling
+            document.querySelectorAll('.friend-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.querySelector('h4').textContent === friendName) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Show chat area
+            document.getElementById('emptyChatState').style.display = 'none';
+            document.getElementById('activeChatArea').style.display = 'flex';
+            document.getElementById('activeChatArea').style.flexDirection = 'column';
+            
+            // Update chat header
+            document.getElementById('chatUserName').textContent = `Chat with ${friendName}`;
+            document.getElementById('chatUserStatus').textContent = 'Online';
+            
+            // Load messages
+            loadChatMessages(friendName);
+        }
+
+        function loadChatMessages(friendName) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messages = chatMessages[friendName] || [];
+            
+            messagesContainer.innerHTML = '';
+            
+            messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.isMe ? 'my-message' : ''}`;
+                
+                messageDiv.innerHTML = `
+                    <div class="message-avatar"></div>
+                    <div class="message-content">
+                        <div class="message-text">${msg.message}</div>
+                        <div class="message-time">${msg.time}</div>
+                    </div>
+                `;
+                
+                messagesContainer.appendChild(messageDiv);
+            });
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message || !activeChatUser) return;
+            
+            // Create new message
+            const now = new Date();
+            const timeStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            const newMessage = {
+                sender: 'Luigi',
+                message: message,
+                time: timeStr,
+                isMe: true
+            };
+            
+            // Add to chat history
+            if (!chatMessages[activeChatUser]) {
+                chatMessages[activeChatUser] = [];
+            }
+            chatMessages[activeChatUser].push(newMessage);
+            
+            // Clear input
+            input.value = '';
+            
+            // Reload messages
+            loadChatMessages(activeChatUser);
+            
+            // Simulate response after 1-3 seconds
+            setTimeout(() => {
+                simulateResponse(activeChatUser);
+            }, Math.random() * 2000 + 1000);
+        }
+
+        function simulateResponse(friendName) {
+            const responses = [
+                "Thanks!",
+                "Got it, let me check",
+                "Okay, I'll send it to you",
+                "Sure thing!",
+                "Let me think about it",
+                "What do you think?",
+                "That's interesting",
+                "I agree with you",
+                "Can you explain more?",
+                "Perfect timing!"
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            const now = new Date();
+            const timeStr = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            const responseMessage = {
+                sender: friendName,
+                message: randomResponse,
+                time: timeStr,
+                isMe: false
+            };
+            
+            chatMessages[friendName].push(responseMessage);
+            
+            // Update if this chat is currently active
+            if (activeChatUser === friendName) {
+                loadChatMessages(friendName);
+            }
+        }
+
+        document.querySelectorAll('.friend-item').forEach(friendItem => {
+            friendItem.addEventListener('click', () => {
+                const friendName = friendItem.querySelector('h4').textContent;
+                selectFriend(friendName);
+            });
+        });
+
+        // Chat input functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) {
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+
+                chatInput.addEventListener('input', () => {
+                    const sendBtn = document.getElementById('sendBtn');
+                    if (sendBtn) {
+                        sendBtn.disabled = chatInput.value.trim() === '';
+                    }
+                });
+            }
+        });
+
+        // Coins earning simulation
+        setInterval(() => {
+            // Simulate earning coins through activity
+            if (Math.random() < 0.1) { // 10% chance every 5 seconds
+                currentCoins += 1;
+                document.getElementById('coinCount').textContent = currentCoins;
+            }
+        }, 5000);
+
+        // Welcome animation
+        window.addEventListener('load', () => {
+            document.querySelector('.character').style.animation = 'wave 2s infinite';
+        });
+
+        // Add wave animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes wave {
+                0%, 100% { transform: rotate(0deg); }
+                25% { transform: rotate(-10deg); }
+                75% { transform: rotate(10deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
